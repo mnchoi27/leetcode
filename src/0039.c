@@ -1,10 +1,18 @@
-int dfs(int* candidates, int candidatesSize, int target, int start, int* buf, int bufSize, int count, int* columnSizes, int** ans) {
-    if (target == 0) {
-        ans[count] = malloc(bufSize * sizeof(int));
-        memcpy(ans[count], buf, bufSize * sizeof(int));
-        columnSizes[count] = bufSize;
+typedef struct {
+    int** ans;
+    int* columnSizes;
+    int count;
+    int buf[40];
+} Context;
 
-        return count + 1;
+void dfs(int* candidates, int candidatesSize, int target, int start, int bufSize, Context* ctx) {
+    if (target == 0) {
+        ctx->ans[ctx->count] = malloc(bufSize * sizeof(int));
+        memcpy(ctx->ans[ctx->count], ctx->buf, bufSize * sizeof(int));
+        ctx->columnSizes[ctx->count] = bufSize;
+        ctx->count++;
+
+        return;
     }
 
     for (int i = start; i < candidatesSize; i++) {
@@ -12,20 +20,22 @@ int dfs(int* candidates, int candidatesSize, int target, int start, int* buf, in
             continue;
         }
 
-        buf[bufSize] = candidates[i];
-        count = dfs(candidates, candidatesSize, target - candidates[i], i, buf, bufSize + 1, count, columnSizes, ans);
+        ctx->buf[bufSize] = candidates[i];
+        dfs(candidates, candidatesSize, target - candidates[i], i, bufSize + 1, ctx);
     }
-
-    return count;
 }
 
 int** combinationSum(int* candidates, int candidatesSize, int target, int* returnSize, int** returnColumnSizes) {
-    int buf[40];
-    int** ans = malloc(150 * sizeof(int*));
-    int* columnSizes = malloc(150 * sizeof(int));
+    Context ctx;
 
-    *returnSize = dfs(candidates, candidatesSize, target, 0, buf, 0, 0, columnSizes, ans);
-    *returnColumnSizes = columnSizes;
+    ctx.ans = malloc(150 * sizeof(int*));
+    ctx.columnSizes = malloc(150 * sizeof(int));
+    ctx.count = 0;
 
-    return ans;
+    dfs(candidates, candidatesSize, target, 0, 0, &ctx);
+
+    *returnSize = ctx.count;
+    *returnColumnSizes = ctx.columnSizes;
+
+    return ctx.ans;
 }
