@@ -11,7 +11,6 @@ void dfs(int* candidates, int candidatesSize, int target, int start, int bufSize
         memcpy(ctx->ans[ctx->count], ctx->buf, bufSize * sizeof(int));
         ctx->columnSizes[ctx->count] = bufSize;
         ctx->count++;
-
         return;
     }
 
